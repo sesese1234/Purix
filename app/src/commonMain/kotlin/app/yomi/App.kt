@@ -228,8 +228,9 @@ private fun TabContent(
     }
 }
 
+/** The bottom bar used on phone-width layouts. Public so it can be rendered in isolation. */
 @Composable
-private fun YomiNavigationBar(navigator: Navigator) {
+fun YomiNavigationBar(navigator: Navigator) {
     val strings = LocalStrings.current
     NavigationBar {
         TopLevelTab.entries.forEach { tab ->
@@ -244,8 +245,9 @@ private fun YomiNavigationBar(navigator: Navigator) {
     }
 }
 
+/** The rail used on wide layouts. Public so it can be rendered in isolation. */
 @Composable
-private fun YomiNavigationRail(navigator: Navigator) {
+fun YomiNavigationRail(navigator: Navigator) {
     val strings = LocalStrings.current
     NavigationRail(
         header = {

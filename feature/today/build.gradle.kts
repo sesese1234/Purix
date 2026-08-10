@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
@@ -6,6 +7,11 @@ plugins {
 
 kotlin {
     jvmToolchain(libs.versions.jvmTarget.get().toInt())
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
     jvm()
 
     compilerOptions {
@@ -24,5 +30,19 @@ kotlin {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
         }
+    }
+}
+
+android {
+    namespace = "app.yomi.feature.today"
+    compileSdk = libs.versions.androidCompileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }

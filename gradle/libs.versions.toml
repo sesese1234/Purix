@@ -7,9 +7,15 @@ datetime = "0.8.0"
 okio = "3.18.1"
 koin = "4.2.2"
 lifecycle = "2.9.6"
-materialKolor = "5.0.0"
+materialKolor = "4.1.1"
 kdroidNotification = "0.2.0"
 jvmTarget = "21"
+androidJvmTarget = "17"
+agp = "8.13.2"
+androidCompileSdk = "36"
+androidMinSdk = "26"
+androidTargetSdk = "36"
+activityCompose = "1.13.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -26,9 +32,12 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 kdroid-notification = { module = "io.github.kdroidfilter:compose-native-notification", version.ref = "kdroidNotification" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -12,6 +12,7 @@ import app.yomi.model.AppearanceSettings
 import app.yomi.model.MotionLevel
 import app.yomi.model.ThemeMode
 import app.yomi.model.UiDensity
+import androidx.compose.foundation.layout.fillMaxSize
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -176,6 +177,48 @@ class ScreenshotTest {
         ) { TodayScreen(state = empty) }
 
         assertRendered(file)
+    }
+
+    @Test
+    fun `the phone layout stacks the timeline above the navigation bar`() {
+        val phone = ScreenshotHarness.render(
+            name = "phone-today",
+            width = 411,
+            height = 880,
+            appearance = still.copy(themeMode = ThemeMode.Light)
+        ) { PhoneShell { TodayScreen(state = SampleData.todayState) } }
+
+        val phoneDark = ScreenshotHarness.render(
+            name = "phone-planner-dark",
+            width = 411,
+            height = 880,
+            appearance = still.copy(themeMode = ThemeMode.Dark),
+            dark = true
+        ) { PhoneShell { PlannerScreen(state = SampleData.plannerState) } }
+
+        val phoneHebrew = ScreenshotHarness.render(
+            name = "phone-hebrew",
+            width = 411,
+            height = 880,
+            appearance = still.copy(themeMode = ThemeMode.Light),
+            language = AppLanguage.Hebrew
+        ) { PhoneShell { TodayScreen(state = SampleData.todayState) } }
+
+        assertRendered(phone, phoneDark, phoneHebrew)
+    }
+
+    /** The same arrangement `YomiApp` uses below the wide-layout breakpoint. */
+    @androidx.compose.runtime.Composable
+    private fun PhoneShell(content: @androidx.compose.runtime.Composable () -> Unit) {
+        val navigator = androidx.compose.runtime.remember { app.yomi.ui.nav.Navigator() }
+        androidx.compose.foundation.layout.Column(
+            androidx.compose.ui.Modifier.fillMaxSize()
+        ) {
+            androidx.compose.foundation.layout.Box(
+                androidx.compose.ui.Modifier.weight(1f)
+            ) { content() }
+            YomiNavigationBar(navigator)
+        }
     }
 
     private fun assertRendered(vararg files: java.io.File) {

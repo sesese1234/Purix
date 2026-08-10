@@ -32,10 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.yomi.designsystem.theme.YomiTheme
 import kotlin.math.PI
@@ -211,47 +215,59 @@ fun WavyProgress(
         label = "wavyProgress"
     )
 
+    // The bar is drawn with raw canvas coordinates, so right-to-left layouts
+    // have to be mirrored explicitly — unlike the box-based bars, which the
+    // layout system flips for free.
+    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
+
     Canvas(modifier.fillMaxWidth().height(height)) {
         val strokeWidth = size.height * 0.7f
         val y = size.height / 2f
-        drawLine(
-            color = trackColor,
-            start = Offset(strokeWidth / 2f, y),
-            end = Offset(size.width - strokeWidth / 2f, y),
-            strokeWidth = strokeWidth,
-            cap = StrokeCap.Round
-        )
-        if (animated <= 0f) return@Canvas
 
-        val end = (size.width - strokeWidth) * animated + strokeWidth / 2f
-        // The closer to done, the calmer the wave.
-        val amplitude = size.height * 0.22f * (1f - animated)
-        if (amplitude < 0.4f) {
+        val body: DrawScope.() -> Unit = {
             drawLine(
-                color = color,
+                color = trackColor,
                 start = Offset(strokeWidth / 2f, y),
-                end = Offset(end, y),
+                end = Offset(size.width - strokeWidth / 2f, y),
                 strokeWidth = strokeWidth,
                 cap = StrokeCap.Round
             )
-        } else {
-            val path = Path().apply {
-                moveTo(strokeWidth / 2f, y)
-                var x = strokeWidth / 2f
-                val step = 3f
-                while (x < end) {
-                    val phase = (x / size.width) * WAVE_CYCLES * 2f * PI.toFloat()
-                    lineTo(x, y + sin(phase) * amplitude)
-                    x += step
+            if (animated > 0f) {
+                val end = (size.width - strokeWidth) * animated + strokeWidth / 2f
+                // The closer to done, the calmer the wave.
+                val amplitude = size.height * 0.22f * (1f - animated)
+                if (amplitude < 0.4f) {
+                    drawLine(
+                        color = color,
+                        start = Offset(strokeWidth / 2f, y),
+                        end = Offset(end, y),
+                        strokeWidth = strokeWidth,
+                        cap = StrokeCap.Round
+                    )
+                } else {
+                    val path = Path().apply {
+                        moveTo(strokeWidth / 2f, y)
+                        var x = strokeWidth / 2f
+                        val step = 3f
+                        while (x < end) {
+                            val phase = (x / size.width) * WAVE_CYCLES * 2f * PI.toFloat()
+                            lineTo(x, y + sin(phase) * amplitude)
+                            x += step
+                        }
+                        lineTo(end, y)
+                    }
+                    drawPath(
+                        path = path,
+                        brush = Brush.horizontalGradient(
+                            listOf(color.copy(alpha = 0.85f), color)
+                        ),
+                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                    )
                 }
-                lineTo(end, y)
             }
-            drawPath(
-                path = path,
-                brush = Brush.horizontalGradient(listOf(color.copy(alpha = 0.85f), color)),
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-            )
         }
+
+        if (mirrored) scale(scaleX = -1f, scaleY = 1f) { body() } else body()
     }
 }
 

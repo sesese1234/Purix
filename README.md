@@ -11,6 +11,9 @@ Built with **Kotlin Multiplatform + Compose Multiplatform**, following
 kdroidFilter's MVVM/clean-module architecture, with a Material 3 Expressive
 design language inspired by ArchiveTune's playful, colour-driven interface.
 
+**Runs on Android and desktop** (Windows, macOS, Linux) from one shared
+codebase — the same Compose tree, the same engines, the same tests.
+
 ---
 
 ## What it does
@@ -108,6 +111,8 @@ Rendered off-screen by the test suite (`app/build/screenshots`):
 | `insights.png` | The full statistics screen |
 | `settings-scoring.png` | The scoring editor with live preview |
 | `palette-*.png` | The palette styles side by side |
+| `phone-today.png` / `phone-planner-dark.png` | The Android phone layout |
+| `phone-hebrew.png` | Phone layout in Hebrew, right-to-left |
 
 ---
 
@@ -121,14 +126,14 @@ Rendered off-screen by the test suite (`app/build/screenshots`):
 :core:data           Okio + JSON persistence with atomic writes and monthly
                      shards; YomiRepository, the single door to everything.
 :core:designsystem   Theme, tokens, components, formatters, and both languages.
-:core:notification   Notifier abstraction + the desktop implementation.
+:core:notification   Notifier abstraction + the desktop and Android backends.
 :core:ui             Navigator and the ViewModel base.
 :feature:today       Today screen and its model.
 :feature:planner     Calendar, copy dialog, templates, task editor.
 :feature:goals       Goal board and editor.
 :feature:insights    Statistics and charts.
 :feature:settings    Every preference, including the scoring editor.
-:app                 Shell, navigation, DI graph, desktop entry point.
+:app                 Shell, navigation, DI graph, desktop and Android entries.
 ```
 
 **Rules the layering enforces**
@@ -144,23 +149,52 @@ Rendered off-screen by the test suite (`app/build/screenshots`):
   each write, so a caller that reads a score right after a mutation always sees
   the result of that mutation.
 
-**Stack**: Kotlin 2.4.10 · Compose Multiplatform 1.11.1 · Koin 4.2.2 ·
-kotlinx-coroutines / serialization / datetime · Okio · MaterialKolor ·
-kdroidFilter compose-native-notification · JVM 21.
+**Stack**: Kotlin 2.4.10 · Compose Multiplatform 1.11.1 · AGP 8.13.2 ·
+Koin 4.2.2 · kotlinx-coroutines / serialization / datetime · Okio ·
+MaterialKolor · kdroidFilter compose-native-notification (desktop) · JVM 21 on
+desktop, JVM 17 bytecode on Android.
 
-The modules are multiplatform source sets with a JVM target wired up; Android
-and iOS targets can be added without touching `commonMain`.
+Every module carries both an `androidTarget()` and a `jvm()` target. Platform
+differences live in exactly three `expect`/`actual` pairs — the data directory,
+the file system, and the notifier — so `commonMain` holds the entire app.
 
 ---
 
 ## Running it
 
 ```bash
-./gradlew :app:run          # launch the desktop app
-./gradlew build             # compile everything and run all 137 tests
-./gradlew :app:jvmTest      # re-render the screenshots
-./gradlew :app:packageDeb   # also packageMsi / packageDmg
+./gradlew :app:run              # launch the desktop app
+./gradlew build                 # compile everything and run all 140 tests
+./gradlew :app:jvmTest          # re-render the screenshots
+./gradlew :app:packageDeb       # desktop installers: also packageMsi / packageDmg
+
+./gradlew :app:assembleDebug    # Android APK, installable as-is
+./gradlew :app:assembleRelease  # Android APK, signed if a keystore is present
 ```
+
+### Android
+
+`minSdk 26` (Android 8.0) · `targetSdk 36` · one Activity hosting the same
+Compose tree the desktop build runs, so the two platforms cannot drift apart.
+Android supplies its private files directory and notification context to the
+shared layer at startup; notifications go through the framework's channel API
+directly, with `POST_NOTIFICATIONS` requested on first launch.
+
+The debug APK installs without any setup. For a signed release build, generate
+a key first — the keystore is deliberately **not** in the repository:
+
+```bash
+keytool -genkeypair -v -keystore keystore/yomi-release.jks -alias yomi \
+  -keyalg RSA -keysize 2048 -validity 10950 \
+  -storepass <password> -keypass <password> -dname "CN=Yomi"
+```
+
+then point `signingConfigs["release"]` in `app/build.gradle.kts` at your own
+credentials. Without a keystore the release task still runs and simply leaves
+the APK unsigned.
+
+Building Android needs an SDK; put its location in `local.properties`
+(`sdk.dir=/path/to/android-sdk`) or set `ANDROID_HOME`.
 
 Data lives in the platform's conventional location — `%APPDATA%\Yomi` on
 Windows, `~/Library/Application Support/Yomi` on macOS, `$XDG_DATA_HOME/yomi`
@@ -172,7 +206,7 @@ a corrupt file degrades to defaults rather than taking your history with it.
 
 ## Tests
 
-137 tests, all green.
+140 tests, all green.
 
 - **Scoring** (29) — weights, priority and category multipliers, all four
   sub-mission rules, quantity credit, punctuality and grace overrides, penalty
@@ -187,8 +221,11 @@ a corrupt file degrades to defaults rather than taking your history with it.
 - **Goals, notifications, streaks, materialisation** (37)
 - **Wiring** (3) — the Koin graph assembles, notifications never repeat, backups
   round-trip
-- **Screenshots** (9) — every screen renders in light, dark, RTL, and all three
-  densities
+- **Screenshots** (10) — every screen renders in light, dark, RTL, all three
+  densities, and the Android phone layout
 
 The screenshot tests earn their place: they caught a `Strings` catalogue that
-compiled cleanly but blew past the JVM's 255-argument limit at class-load time.
+compiled cleanly but blew past the JVM's 255-argument limit at class-load time,
+and a progress bar drawn with raw canvas coordinates that never mirrored itself
+in Hebrew. Android Lint caught a third: notification channels need API 26, so
+`minSdk` moved from 24 rather than shipping a path that would crash on 24 and 25.
