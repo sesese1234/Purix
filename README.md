@@ -92,6 +92,17 @@ day / category / priority / status / none), which cards appear on Today, week
 start, 12/24-hour clock, a configurable **day boundary hour** for night owls,
 and the whole scoring rulebook.
 
+### Icons
+The interface is drawn with vector icons, not emoji. `YomiIcons` declares the
+standard 24dp Material paths — the same geometry that ships as XML vector
+drawables with the Android SDK — and builds them into Compose `ImageVector`s at
+runtime. That keeps one icon set rendering identically on Android and desktop,
+where an Android `res/drawable` would only work on one of them, and costs
+twenty icons instead of an icon-library dependency.
+
+Emoji survive in exactly one place: the optional emoji field on a task,
+category or goal, which is the user's own content and can be switched off.
+
 **Full Hebrew and English**, with genuine right-to-left layout — not translated
 English in a left-to-right shell.
 
@@ -164,7 +175,7 @@ the file system, and the notifier — so `commonMain` holds the entire app.
 
 ```bash
 ./gradlew :app:run              # launch the desktop app
-./gradlew build                 # compile everything and run all 140 tests
+./gradlew build                 # compile everything and run all 138 tests
 ./gradlew :app:jvmTest          # re-render the screenshots
 ./gradlew :app:packageDeb       # desktop installers: also packageMsi / packageDmg
 
@@ -206,7 +217,7 @@ a corrupt file degrades to defaults rather than taking your history with it.
 
 ## Tests
 
-140 tests, all green.
+138 tests, all green.
 
 - **Scoring** (29) — weights, priority and category multipliers, all four
   sub-mission rules, quantity credit, punctuality and grace overrides, penalty

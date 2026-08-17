@@ -148,7 +148,7 @@ class DayCopyEngine(private val ids: IdGenerator) {
     fun toTemplate(
         source: DayPlan,
         name: String,
-        emoji: String = "🗂️",
+        emoji: String = "",
         description: String = "",
         createdAt: String = "",
         options: CopyOptions = CopyOptions(resetProgress = true)

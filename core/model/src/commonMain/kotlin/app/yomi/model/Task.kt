@@ -139,7 +139,7 @@ data class ReminderRule(
 data class TaskDefinition(
     val id: String,
     val title: String,
-    val emoji: String = "✨",
+    val emoji: String = "",
     val notes: String = "",
     val categoryId: String? = null,
     val priority: Priority = Priority.Normal,

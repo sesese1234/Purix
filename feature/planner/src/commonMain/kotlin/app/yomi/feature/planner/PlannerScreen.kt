@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -46,6 +49,7 @@ import app.yomi.designsystem.components.scoreColor
 import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
 import app.yomi.designsystem.i18n.format
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.domain.plan.CopyOptions
 import app.yomi.model.TaskDefinition
@@ -189,9 +193,11 @@ private fun CalendarPane(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                TextButton(onClick = { onShiftMonth(-1) }) { Text("‹") }
+                val back = if (strings.isRtl) YomiIcons.ChevronEnd else YomiIcons.ChevronStart
+                val forward = if (strings.isRtl) YomiIcons.ChevronStart else YomiIcons.ChevronEnd
+                IconButton(onClick = { onShiftMonth(-1) }) { Icon(back, contentDescription = null) }
                 TextButton(onClick = onGoToToday) { Text(strings.today) }
-                TextButton(onClick = { onShiftMonth(1) }) { Text("›") }
+                IconButton(onClick = { onShiftMonth(1) }) { Icon(forward, contentDescription = null) }
             }
         }
 
@@ -225,8 +231,14 @@ private fun CalendarPane(
 
         item("dayActions") {
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.small)) {
-                Button(onClick = onOpenCopy, modifier = Modifier.weight(1f)) { Text(strings.copyDay) }
+                Button(onClick = onOpenCopy, modifier = Modifier.weight(1f)) {
+                    Icon(YomiIcons.Copy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(spacing.small))
+                    Text(strings.copyDay)
+                }
                 OutlinedButton(onClick = onSaveTemplate, modifier = Modifier.weight(1f)) {
+                    Icon(YomiIcons.Template, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(spacing.small))
                     Text(strings.saveAsTemplate)
                 }
             }
@@ -247,8 +259,7 @@ private fun CalendarPane(
                         StatTile(
                             value = Fmt.score(score.score),
                             label = strings.todayScore,
-                            modifier = Modifier.weight(1f),
-                            emoji = score.grade.emoji
+                            modifier = Modifier.weight(1f)
                         )
                         StatTile(
                             value = score.tasksDone.toString(),
@@ -269,7 +280,7 @@ private fun CalendarPane(
 
         if (state.selectedPlan.entries.isEmpty()) {
             item("emptyDay") {
-                EmptyState(emoji = "🗓️", title = strings.emptyDayTitle, body = strings.emptyDayBody)
+                EmptyState(icon = YomiIcons.Planner, title = strings.emptyDayTitle, body = strings.emptyDayBody)
             }
         } else {
             items(state.selectedPlan.entries, key = { it.id }) { entry ->
@@ -363,7 +374,7 @@ private fun LibraryPane(
 
         if (state.tasks.isEmpty()) {
             item("empty") {
-                EmptyState(emoji = "📋", title = strings.library, body = strings.emptyDayBody)
+                EmptyState(icon = YomiIcons.Inbox, title = strings.library, body = strings.emptyDayBody)
             }
         }
 
@@ -374,7 +385,13 @@ private fun LibraryPane(
                 shape = MaterialTheme.shapes.medium
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(task.emoji, style = MaterialTheme.typography.titleMedium)
+                    Icon(
+                        imageVector = YomiIcons.Label,
+                        contentDescription = null,
+                        tint = state.categories[task.categoryId]
+                            ?.let { Color(it.colorArgb.toInt()) }
+                            ?: MaterialTheme.colorScheme.primary
+                    )
                     Spacer(Modifier.width(spacing.medium))
                     Column(Modifier.weight(1f)) {
                         Text(
@@ -394,10 +411,15 @@ private fun LibraryPane(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    TextButton(onClick = { onToggleArchive(task.id, !task.archived) }) {
-                        Text(if (task.archived) strings.restore else strings.archive)
+                    IconButton(onClick = { onToggleArchive(task.id, !task.archived) }) {
+                        Icon(
+                            imageVector = if (task.archived) YomiIcons.Restore else YomiIcons.Archive,
+                            contentDescription = if (task.archived) strings.restore else strings.archive
+                        )
                     }
-                    TextButton(onClick = { onDeleteTask(task) }) { Text("🗑") }
+                    IconButton(onClick = { onDeleteTask(task) }) {
+                        Icon(YomiIcons.Delete, contentDescription = strings.delete)
+                    }
                 }
             }
         }
@@ -431,14 +453,18 @@ private fun TemplatePane(
 
         if (state.templates.isEmpty()) {
             item("empty") {
-                EmptyState(emoji = "🗂️", title = strings.noTemplates, body = strings.emptyDayBody)
+                EmptyState(icon = YomiIcons.Template, title = strings.noTemplates, body = strings.emptyDayBody)
             }
         }
 
         items(state.templates, key = { it.id }) { template ->
             YomiCard(shape = MaterialTheme.shapes.medium) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(template.emoji, style = MaterialTheme.typography.titleMedium)
+                    Icon(
+                        imageVector = YomiIcons.Template,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(Modifier.width(spacing.medium))
                     Column(Modifier.weight(1f)) {
                         Text(template.name, style = MaterialTheme.typography.bodyLarge)
@@ -449,7 +475,9 @@ private fun TemplatePane(
                         )
                     }
                     Button(onClick = { onApply(template.id) }) { Text(strings.apply) }
-                    TextButton(onClick = { onDelete(template.id) }) { Text("🗑") }
+                    IconButton(onClick = { onDelete(template.id) }) {
+                        Icon(YomiIcons.Delete, contentDescription = strings.delete)
+                    }
                 }
             }
         }

@@ -85,15 +85,6 @@ object Fmt {
         DayPart.Anytime -> strings.partAnytime
     }
 
-    fun dayPartEmoji(part: DayPart): String = when (part) {
-        DayPart.EarlyMorning -> "🌄"
-        DayPart.Morning -> "☀️"
-        DayPart.Afternoon -> "🌤️"
-        DayPart.Evening -> "🌆"
-        DayPart.Night -> "🌙"
-        DayPart.Anytime -> "🕊️"
-    }
-
     fun status(status: EntryStatus, strings: Strings): String = when (status) {
         EntryStatus.Pending -> strings.statusPending
         EntryStatus.InProgress -> strings.statusInProgress

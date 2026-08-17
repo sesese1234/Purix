@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +33,7 @@ import app.yomi.designsystem.components.YomiChip
 import app.yomi.designsystem.components.YomiDialog
 import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.model.Category
 import app.yomi.model.EnergyLevel
@@ -72,7 +75,7 @@ fun TaskEditorDialog(
     val spacing = YomiTheme.spacing
 
     var title by remember { mutableStateOf(original?.title.orEmpty()) }
-    var emoji by remember { mutableStateOf(original?.emoji ?: "✨") }
+    var emoji by remember { mutableStateOf(original?.emoji.orEmpty()) }
     var notes by remember { mutableStateOf(original?.notes.orEmpty()) }
     var categoryId by remember { mutableStateOf(original?.categoryId) }
     var priority by remember { mutableStateOf(original?.priority ?: Priority.Normal) }
@@ -166,7 +169,7 @@ fun TaskEditorDialog(
                 TaskDefinition(
                     id = original?.id ?: newId(),
                     title = title.trim(),
-                    emoji = emoji.ifBlank { "✨" },
+                    emoji = emoji.trim(),
                     notes = notes,
                     categoryId = categoryId,
                     priority = priority,
@@ -367,7 +370,9 @@ fun TaskEditorDialog(
                     }) {
                         Text(if (subtask.optional) strings.optional else strings.all)
                     }
-                    TextButton(onClick = { subtasks.removeAt(index) }) { Text("🗑") }
+                    IconButton(onClick = { subtasks.removeAt(index) }) {
+                        Icon(YomiIcons.Delete, contentDescription = strings.delete)
+                    }
                 }
             }
             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {

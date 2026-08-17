@@ -180,7 +180,7 @@ class PlannerViewModel(repository: YomiRepository) : YomiViewModel(repository) {
 
     // --------------------------------------------------------------- templates
 
-    fun saveAsTemplate(name: String, emoji: String = "🗂️") = act {
+    fun saveAsTemplate(name: String, emoji: String = "") = act {
         repository.saveDayAsTemplate(selected.value, name, emoji)
     }
 

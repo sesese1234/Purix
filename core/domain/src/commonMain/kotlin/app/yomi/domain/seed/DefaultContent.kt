@@ -30,17 +30,17 @@ object DefaultContent {
     fun catalog(today: LocalDate, language: AppLanguage): Catalog {
         val t = if (language == AppLanguage.Hebrew) Hebrew else English
 
-        val morning = Category("cat-morning", t.morning, "🌅", 0xFFFFB4A2, 1.0, 0)
-        val work = Category("cat-work", t.work, "💼", 0xFF7C6BF2, 1.2, 1)
-        val body = Category("cat-body", t.body, "🏃", 0xFF4CC9A7, 1.0, 2)
-        val mind = Category("cat-mind", t.mind, "📚", 0xFFFFC857, 1.0, 3)
-        val home = Category("cat-home", t.home, "🏠", 0xFF8ECAE6, 0.8, 4)
-        val evening = Category("cat-evening", t.evening, "🌙", 0xFFB39DDB, 1.0, 5)
+        val morning = Category("cat-morning", t.morning, "", 0xFFFFB4A2, 1.0, 0)
+        val work = Category("cat-work", t.work, "", 0xFF7C6BF2, 1.2, 1)
+        val body = Category("cat-body", t.body, "", 0xFF4CC9A7, 1.0, 2)
+        val mind = Category("cat-mind", t.mind, "", 0xFFFFC857, 1.0, 3)
+        val home = Category("cat-home", t.home, "", 0xFF8ECAE6, 0.8, 4)
+        val evening = Category("cat-evening", t.evening, "", 0xFFB39DDB, 1.0, 5)
 
         val readingGoal = Goal(
             id = "goal-reading",
             title = t.readingGoal,
-            emoji = "📖",
+            emoji = "",
             type = GoalType.Quantity,
             target = 150.0,
             unit = t.pages,
@@ -55,7 +55,7 @@ object DefaultContent {
         val movementGoal = Goal(
             id = "goal-movement",
             title = t.movementGoal,
-            emoji = "💪",
+            emoji = "",
             type = GoalType.Count,
             target = 4.0,
             unit = t.sessions,
@@ -69,7 +69,7 @@ object DefaultContent {
         val scoreGoal = Goal(
             id = "goal-score",
             title = t.scoreGoal,
-            emoji = "🌟",
+            emoji = "",
             type = GoalType.AverageScore,
             target = 85.0,
             period = GoalPeriod.Week,
@@ -100,7 +100,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-wake",
                 title = t.wakeRoutine,
-                emoji = "☀️",
+                emoji = "",
                 categoryId = morning.id,
                 priority = Priority.High,
                 energy = EnergyLevel.Light,
@@ -117,7 +117,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-plan",
                 title = t.planDay,
-                emoji = "🗒️",
+                emoji = "",
                 categoryId = work.id,
                 priority = Priority.Critical,
                 timing = TaskTiming.Fixed(LocalTime(8, 30), LocalTime(8, 45)),
@@ -128,7 +128,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-deep",
                 title = t.deepWork,
-                emoji = "🎯",
+                emoji = "",
                 categoryId = work.id,
                 priority = Priority.Critical,
                 energy = EnergyLevel.Deep,
@@ -144,7 +144,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-move",
                 title = t.workout,
-                emoji = "🏋️",
+                emoji = "",
                 categoryId = body.id,
                 priority = Priority.High,
                 energy = EnergyLevel.Deep,
@@ -156,7 +156,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-read",
                 title = t.read,
-                emoji = "📖",
+                emoji = "",
                 categoryId = mind.id,
                 energy = EnergyLevel.Light,
                 timing = TaskTiming.Deadline(LocalTime(22, 30)),
@@ -172,7 +172,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-tidy",
                 title = t.tidy,
-                emoji = "🧹",
+                emoji = "",
                 categoryId = home.id,
                 priority = Priority.Low,
                 timing = TaskTiming.Anytime,
@@ -183,7 +183,7 @@ object DefaultContent {
             TaskDefinition(
                 id = "task-winddown",
                 title = t.windDown,
-                emoji = "🌙",
+                emoji = "",
                 categoryId = evening.id,
                 timing = TaskTiming.Fixed(LocalTime(22, 30), LocalTime(23, 0)),
                 schedule = everyDay,

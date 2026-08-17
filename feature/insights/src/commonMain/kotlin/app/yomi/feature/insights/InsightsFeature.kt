@@ -34,6 +34,7 @@ import app.yomi.designsystem.components.YomiChip
 import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
 import app.yomi.designsystem.i18n.insightText
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.domain.insights.InsightsReport
 import app.yomi.domain.insights.StatisticsEngine
@@ -161,7 +162,7 @@ fun InsightsScreen(
 
         if (report == null || report.daysTracked == 0) {
             item("empty") {
-                EmptyState(emoji = "📈", title = strings.insights, body = strings.notEnoughData)
+                EmptyState(icon = YomiIcons.Insights, title = strings.insights, body = strings.notEnoughData)
             }
             return@LazyColumn
         }
@@ -223,7 +224,7 @@ fun InsightsScreen(
                     value = report.perfectDays.toString(),
                     label = strings.perfectDays,
                     modifier = Modifier.weight(1f),
-                    emoji = "🌟"
+                    icon = YomiIcons.Star
                 )
             }
         }
@@ -267,7 +268,6 @@ fun InsightsScreen(
                             label = bucket.label,
                             value = "${bucket.done}/${bucket.planned}",
                             ratio = bucket.completionRate.toFloat(),
-                            emoji = bucket.emoji,
                             color = bucket.colorArgb?.let { Color(it.toInt()) }
                                 ?: MaterialTheme.colorScheme.primary
                         )
@@ -300,7 +300,7 @@ fun InsightsScreen(
                         value = report.averageWakeMinutes?.let { minutesToClock(it) } ?: "—",
                         label = strings.averageWake,
                         modifier = Modifier.weight(1f),
-                        emoji = "☀️"
+                        icon = YomiIcons.Sun
                     )
                     StatTile(
                         value = report.wakeConsistencyMinutes?.let { "±$it′" } ?: "—",

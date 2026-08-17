@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 data class Goal(
     val id: String,
     val title: String,
-    val emoji: String = "🎯",
+    val emoji: String = "",
     val description: String = "",
     val type: GoalType = GoalType.Count,
     val target: Double = 5.0,

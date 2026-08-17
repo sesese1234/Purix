@@ -159,7 +159,6 @@ class TodayViewModel(repository: YomiRepository) : YomiViewModel(repository) {
                 PlanEntry(
                     id = repository.newId(),
                     title = title.trim(),
-                    emoji = "✨",
                     timing = timing,
                     priority = priority
                 )

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
 import app.yomi.designsystem.i18n.format
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.model.EntryStatus
 import app.yomi.model.PlanEntry
@@ -81,10 +83,13 @@ fun TaskRow(
             StatusBadge(
                 status = entry.status,
                 color = statusColor,
-                emoji = if (showEmoji) entry.emoji else null,
                 onClick = onToggleDone
             )
             Spacer(Modifier.width(spacing.medium))
+            if (showEmoji && entry.emoji.isNotBlank()) {
+                Text(entry.emoji, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.width(spacing.small))
+            }
 
             Column(Modifier.weight(1f).alpha(if (faded) 0.6f else 1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -99,7 +104,12 @@ fun TaskRow(
                     )
                     if (entry.priority == Priority.Critical) {
                         Spacer(Modifier.width(spacing.tiny))
-                        Text("‼️", style = MaterialTheme.typography.labelMedium)
+                        Icon(
+                            imageVector = YomiIcons.Warning,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
 
@@ -174,10 +184,11 @@ fun TaskRow(
                             contentAlignment = Alignment.Center
                         ) {
                             if (subtask.done) {
-                                Text(
-                                    "✓",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = accents.onSuccess
+                                Icon(
+                                    imageVector = YomiIcons.Check,
+                                    contentDescription = null,
+                                    tint = accents.onSuccess,
+                                    modifier = Modifier.size(14.dp)
                                 )
                             }
                         }
@@ -212,7 +223,6 @@ fun TaskRow(
 private fun StatusBadge(
     status: EntryStatus,
     color: Color,
-    emoji: String?,
     onClick: () -> Unit
 ) {
     val motion = YomiTheme.motion
@@ -223,6 +233,16 @@ private fun StatusBadge(
     )
     val background = color.copy(alpha = 0.16f + 0.5f * fill)
 
+    val icon = when (status) {
+        EntryStatus.Done -> YomiIcons.Check
+        EntryStatus.Partial -> YomiIcons.PartlyDone
+        EntryStatus.Missed -> YomiIcons.Close
+        EntryStatus.Skipped -> YomiIcons.Remove
+        EntryStatus.Deferred -> YomiIcons.Forward
+        EntryStatus.InProgress -> YomiIcons.Play
+        EntryStatus.Pending -> YomiIcons.Pending
+    }
+
     Box(
         modifier = Modifier
             .size(BADGE_SIZE.dp)
@@ -232,24 +252,11 @@ private fun StatusBadge(
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        val glyph = when (status) {
-            EntryStatus.Done -> "✓"
-            EntryStatus.Partial -> "◐"
-            EntryStatus.Missed -> "✕"
-            EntryStatus.Skipped -> "–"
-            EntryStatus.Deferred -> "»"
-            EntryStatus.InProgress -> "▶"
-            EntryStatus.Pending -> emoji ?: ""
-        }
-        Text(
-            text = glyph,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (status == EntryStatus.Pending) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                color
-            }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(BADGE_ICON.dp)
         )
     }
 }
@@ -277,3 +284,4 @@ private fun LatenessLabel(entry: PlanEntry, statusColor: Color) {
 }
 
 private const val BADGE_SIZE = 42
+private const val BADGE_ICON = 22

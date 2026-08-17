@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.yomi.designsystem.i18n.LocalStrings
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.feature.goals.GoalsScreen
 import app.yomi.feature.goals.GoalsViewModel
@@ -237,7 +239,7 @@ fun YomiNavigationBar(navigator: Navigator) {
             NavigationBarItem(
                 selected = navigator.tab == tab,
                 onClick = { navigator.selectTab(tab) },
-                icon = { Text(tab.emoji, style = MaterialTheme.typography.titleMedium) },
+                icon = { Icon(tab.icon, contentDescription = tab.label(strings)) },
                 label = { Text(tab.label(strings)) },
                 alwaysShowLabel = true
             )
@@ -255,7 +257,11 @@ fun YomiNavigationRail(navigator: Navigator) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(vertical = 12.dp)
             ) {
-                Text("🌤️", style = MaterialTheme.typography.headlineSmall)
+                Icon(
+                    imageVector = YomiIcons.Today,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Text(
                     text = strings.appName,
                     style = MaterialTheme.typography.labelLarge,
@@ -269,7 +275,7 @@ fun YomiNavigationRail(navigator: Navigator) {
             NavigationRailItem(
                 selected = navigator.tab == tab,
                 onClick = { navigator.selectTab(tab) },
-                icon = { Text(tab.emoji, style = MaterialTheme.typography.titleMedium) },
+                icon = { Icon(tab.icon, contentDescription = tab.label(strings)) },
                 label = { Text(tab.label(strings)) }
             )
         }

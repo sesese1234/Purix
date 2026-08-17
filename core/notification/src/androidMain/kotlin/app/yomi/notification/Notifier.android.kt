@@ -16,10 +16,19 @@ import android.os.Build
  */
 object AndroidNotifications {
     private var appContext: Context? = null
+    private var smallIconRes: Int = 0
 
-    fun initialize(context: Context) {
+    /**
+     * [smallIcon] is the app's own status-bar vector; without it the system
+     * falls back to a generic glyph that looks nothing like the app.
+     */
+    fun initialize(context: Context, smallIcon: Int = 0) {
         appContext = context.applicationContext
+        smallIconRes = smallIcon
     }
+
+    internal fun smallIcon(): Int =
+        if (smallIconRes != 0) smallIconRes else android.R.drawable.ic_popup_reminder
 
     internal fun context(): Context? = appContext
 
@@ -42,7 +51,7 @@ private class AndroidNotifier(private val appName: String) : Notifier {
             .setContentTitle(payload.title)
             .setContentText(payload.body)
             .setStyle(Notification.BigTextStyle().bigText(payload.body))
-            .setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setSmallIcon(AndroidNotifications.smallIcon())
             .setAutoCancel(true)
             .build()
 

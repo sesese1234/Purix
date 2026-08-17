@@ -410,7 +410,7 @@ class YomiRepository(
         return result
     }
 
-    suspend fun saveDayAsTemplate(date: LocalDate, name: String, emoji: String = "🗂️"): DayTemplate? {
+    suspend fun saveDayAsTemplate(date: LocalDate, name: String, emoji: String = ""): DayTemplate? {
         val source = journalStore.day(date) ?: return null
         val template = copyEngine.toTemplate(source, name, emoji, createdAt = clock.now().toString())
         editCatalog { it.copy(templates = it.templates + template) }

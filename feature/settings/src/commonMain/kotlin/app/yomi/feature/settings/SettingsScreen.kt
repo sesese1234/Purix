@@ -304,8 +304,7 @@ private fun ScoringSection(state: SettingsUiState, actions: SettingsActions) {
             StatTile(
                 value = preview?.let { Fmt.score(it.score) } ?: "—",
                 label = strings.todayScore,
-                modifier = Modifier.weight(1f),
-                emoji = preview?.grade?.emoji
+                modifier = Modifier.weight(1f)
             )
             StatTile(
                 value = preview?.let { Fmt.score(it.baseScore) } ?: "—",

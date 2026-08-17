@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import app.yomi.data.YomiRepository
 import app.yomi.designsystem.components.ConfirmDialog
 import app.yomi.designsystem.components.EmptyState
@@ -38,6 +42,7 @@ import app.yomi.designsystem.components.YomiDialog
 import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
 import app.yomi.designsystem.i18n.format
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.model.Category
 import app.yomi.model.Goal
@@ -126,7 +131,7 @@ fun GoalsScreen(
 
         if (state.goals.isEmpty()) {
             item("empty") {
-                EmptyState(emoji = "🎯", title = strings.noGoals, body = strings.noGoalsBody)
+                EmptyState(icon = YomiIcons.Goals, title = strings.noGoals, body = strings.noGoalsBody)
             }
         }
 
@@ -144,11 +149,15 @@ fun GoalsScreen(
             items(state.archived, key = { it.id }) { goal ->
                 YomiCard(shape = MaterialTheme.shapes.medium) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(goal.emoji)
+                        Icon(YomiIcons.Goals, contentDescription = null)
                         Spacer(Modifier.width(spacing.small))
                         Text(goal.title, modifier = Modifier.weight(1f))
-                        TextButton(onClick = { onArchive(goal, false) }) { Text(strings.restore) }
-                        TextButton(onClick = { deleteTarget = goal }) { Text("🗑") }
+                        IconButton(onClick = { onArchive(goal, false) }) {
+                            Icon(YomiIcons.Restore, contentDescription = strings.restore)
+                        }
+                        IconButton(onClick = { deleteTarget = goal }) {
+                            Icon(YomiIcons.Delete, contentDescription = strings.delete)
+                        }
                     }
                 }
             }
@@ -192,7 +201,15 @@ private fun GoalCard(
 
     YomiCard(accent = accent, onClick = onEdit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(row.goal.emoji, style = MaterialTheme.typography.headlineSmall)
+            Icon(
+                imageVector = YomiIcons.Goals,
+                contentDescription = null,
+                tint = accent
+            )
+            if (row.goal.emoji.isNotBlank() && YomiTheme.appearance.showEmojis) {
+                Spacer(Modifier.width(spacing.small))
+                Text(row.goal.emoji, style = MaterialTheme.typography.titleMedium)
+            }
             Spacer(Modifier.width(spacing.medium))
             Column(Modifier.weight(1f)) {
                 Text(
@@ -219,18 +236,29 @@ private fun GoalCard(
 
         Spacer(Modifier.height(spacing.small))
         Row(verticalAlignment = Alignment.CenterVertically) {
+            val paceColor = when {
+                progress.isComplete || progress.isOnPace -> YomiTheme.accents.success
+                else -> YomiTheme.accents.warning
+            }
+            Icon(
+                imageVector = when {
+                    progress.isComplete -> YomiIcons.CheckCircle
+                    progress.isOnPace -> YomiIcons.Check
+                    else -> YomiIcons.Warning
+                },
+                contentDescription = null,
+                tint = paceColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(spacing.tiny))
             Text(
                 text = when {
-                    progress.isComplete -> "✅ ${strings.goalComplete}"
-                    progress.isOnPace -> "🟢 ${strings.onPace}"
-                    else -> "🟠 ${strings.behindPace}"
+                    progress.isComplete -> strings.goalComplete
+                    progress.isOnPace -> strings.onPace
+                    else -> strings.behindPace
                 },
                 style = MaterialTheme.typography.labelMedium,
-                color = when {
-                    progress.isComplete -> YomiTheme.accents.success
-                    progress.isOnPace -> YomiTheme.accents.success
-                    else -> YomiTheme.accents.warning
-                }
+                color = paceColor
             )
             Spacer(Modifier.weight(1f))
             val paceIsMeaningful = row.goal.type != GoalType.AverageScore &&
@@ -268,7 +296,7 @@ private fun GoalEditorDialog(
     val spacing = YomiTheme.spacing
 
     var title by remember { mutableStateOf(original?.title.orEmpty()) }
-    var emoji by remember { mutableStateOf(original?.emoji ?: "🎯") }
+    var emoji by remember { mutableStateOf(original?.emoji.orEmpty()) }
     var type by remember { mutableStateOf(original?.type ?: GoalType.Count) }
     var period by remember { mutableStateOf(original?.period ?: GoalPeriod.Week) }
     var target by remember { mutableStateOf(Fmt.amount(original?.target ?: DEFAULT_TARGET)) }
@@ -287,7 +315,7 @@ private fun GoalEditorDialog(
                 Goal(
                     id = original?.id ?: newId(),
                     title = title.trim(),
-                    emoji = emoji.ifBlank { "🎯" },
+                    emoji = emoji.trim(),
                     description = original?.description.orEmpty(),
                     type = type,
                     target = target.toDoubleOrNull() ?: DEFAULT_TARGET,

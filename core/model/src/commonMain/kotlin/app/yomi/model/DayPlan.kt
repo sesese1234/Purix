@@ -15,7 +15,7 @@ data class PlanEntry(
     /** Source blueprint, or null for an item added straight onto the day. */
     val taskId: String? = null,
     val title: String,
-    val emoji: String = "✨",
+    val emoji: String = "",
     val notes: String = "",
     val categoryId: String? = null,
     val priority: Priority = Priority.Normal,
@@ -157,7 +157,7 @@ data class DayPlan(
 data class DayTemplate(
     val id: String,
     val name: String,
-    val emoji: String = "🗂️",
+    val emoji: String = "",
     val description: String = "",
     val entries: List<PlanEntry> = emptyList(),
     val checkIn: DayCheckIn = DayCheckIn(),
@@ -170,7 +170,7 @@ data class DayTemplate(
 data class Category(
     val id: String,
     val name: String,
-    val emoji: String = "🏷️",
+    val emoji: String = "",
     /** ARGB, stored as a signed long so it round-trips through JSON cleanly. */
     val colorArgb: Long = 0xFF7C6BF2,
     /** Multiplies the weight of every task in this category. */

@@ -216,7 +216,6 @@ fun BreakdownRow(
     value: String,
     ratio: Float,
     modifier: Modifier = Modifier,
-    emoji: String? = null,
     color: Color = MaterialTheme.colorScheme.primary
 ) {
     Row(
@@ -224,7 +223,12 @@ fun BreakdownRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(YomiTheme.spacing.small)
     ) {
-        if (emoji != null) Text(emoji, style = MaterialTheme.typography.bodyMedium)
+        Box(
+            Modifier
+                .size(DOT_SIZE)
+                .clip(RoundedCornerShape(percent = 50))
+                .background(color)
+        )
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
@@ -239,6 +243,8 @@ fun BreakdownRow(
         )
     }
 }
+
+private val DOT_SIZE = 10.dp
 
 private const val BAR_MIN_FRACTION = 0.02f
 private const val LABEL_WEIGHT = 1.1f

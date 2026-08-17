@@ -29,7 +29,6 @@ import app.yomi.model.DayPart
 import app.yomi.model.DayPlan
 import app.yomi.model.EntryStatus
 import app.yomi.model.PlanEntry
-import app.yomi.model.SubtaskState
 import app.yomi.designsystem.format.Fmt
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -297,5 +296,3 @@ object SampleData {
     private const val QUANTITY_SO_FAR = 12.0
     private const val POTENTIAL_SCORE = 97.5
 }
-
-private fun SubtaskState.touched(): Boolean = done

@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -46,6 +49,7 @@ import app.yomi.designsystem.format.Fmt
 import app.yomi.designsystem.i18n.LocalStrings
 import app.yomi.designsystem.i18n.format
 import app.yomi.designsystem.i18n.insightText
+import app.yomi.designsystem.icons.YomiIcons
 import app.yomi.designsystem.theme.YomiTheme
 import app.yomi.model.DayPart
 import app.yomi.model.EntryStatus
@@ -98,7 +102,7 @@ fun TodayScreen(
                 ExtendedFloatingActionButton(
                     onClick = { quickAddVisible = true },
                     text = { Text(strings.addTask) },
-                    icon = { Text("＋", style = MaterialTheme.typography.titleLarge) }
+                    icon = { Icon(YomiIcons.Add, contentDescription = null) }
                 )
             }
         }
@@ -151,7 +155,7 @@ fun TodayScreen(
             if (state.entries.isEmpty()) {
                 item("empty") {
                     EmptyState(
-                        emoji = "🌱",
+                        icon = YomiIcons.Inbox,
                         title = strings.emptyDayTitle,
                         body = strings.emptyDayBody,
                         action = {
@@ -295,13 +299,14 @@ private fun DayHeader(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        val backGlyph = if (strings.isRtl) "›" else "‹"
-        val forwardGlyph = if (strings.isRtl) "‹" else "›"
-        TextButton(onClick = { onShiftDay(-1) }) { Text(backGlyph) }
+        // The chevrons follow the reading direction, not the screen edge.
+        val back = if (strings.isRtl) YomiIcons.ChevronEnd else YomiIcons.ChevronStart
+        val forward = if (strings.isRtl) YomiIcons.ChevronStart else YomiIcons.ChevronEnd
+        IconButton(onClick = { onShiftDay(-1) }) { Icon(back, contentDescription = strings.yesterday) }
         if (!state.isToday) {
             TextButton(onClick = onGoToToday) { Text(strings.today) }
         }
-        TextButton(onClick = { onShiftDay(1) }) { Text(forwardGlyph) }
+        IconButton(onClick = { onShiftDay(1) }) { Icon(forward, contentDescription = strings.tomorrow) }
     }
 }
 
@@ -338,12 +343,21 @@ private fun ScoreCard(state: TodayUiState, onOpenDetail: () -> Unit) {
                     )
                 }
                 if (score?.isPerfectDay == true) {
-                    Text(
-                        text = "🌟 ${strings.perfectDay}",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = YomiTheme.accents.success,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = YomiIcons.Star,
+                            contentDescription = null,
+                            tint = YomiTheme.accents.success,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(YomiTheme.spacing.tiny))
+                        Text(
+                            text = strings.perfectDay,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = YomiTheme.accents.success,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -386,7 +400,7 @@ private fun ProgressCard(state: TodayUiState) {
                 value = state.streak.toString(),
                 label = strings.bonusStreak,
                 modifier = Modifier.weight(1f),
-                emoji = "🔥"
+                icon = YomiIcons.Streak
             )
         }
     }
@@ -412,10 +426,14 @@ private fun CheckInCard(
         Spacer(Modifier.height(YomiTheme.spacing.medium))
         Row(horizontalArrangement = Arrangement.spacedBy(YomiTheme.spacing.small)) {
             OutlinedButton(onClick = onPickWake, modifier = Modifier.weight(1f)) {
-                Text("☀️ ${Fmt.time(checkIn.wakeActual, use24h)}")
+                Icon(YomiIcons.Sun, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(YomiTheme.spacing.small))
+                Text(Fmt.time(checkIn.wakeActual, use24h))
             }
             OutlinedButton(onClick = onPickSleep, modifier = Modifier.weight(1f)) {
-                Text("🌙 ${Fmt.time(checkIn.sleepActual, use24h)}")
+                Icon(YomiIcons.Moon, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(YomiTheme.spacing.small))
+                Text(Fmt.time(checkIn.sleepActual, use24h))
             }
         }
         checkIn.wakeDeltaMinutes?.let { delta ->
@@ -435,10 +453,9 @@ private fun CheckInCard(
         Text(strings.mood, style = MaterialTheme.typography.labelMedium)
         Spacer(Modifier.height(YomiTheme.spacing.tiny))
         Row(horizontalArrangement = Arrangement.spacedBy(YomiTheme.spacing.tiny)) {
-            MOOD_EMOJI.forEachIndexed { index, emoji ->
-                val value = index + 1
+            (1..MOOD_LEVELS).forEach { value ->
                 YomiChip(
-                    label = emoji,
+                    label = value.toString(),
                     selected = checkIn.mood == value,
                     onClick = { onSetMood(if (checkIn.mood == value) null else value) }
                 )
@@ -478,7 +495,11 @@ private fun UpNextCard(
             )
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(entry.emoji, style = MaterialTheme.typography.headlineSmall)
+                Icon(
+                    imageVector = YomiIcons.Schedule,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
                 Spacer(Modifier.width(YomiTheme.spacing.medium))
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -506,7 +527,11 @@ private fun StreakCard(state: TodayUiState) {
     val strings = LocalStrings.current
     YomiCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("🔥", style = MaterialTheme.typography.headlineMedium)
+            Icon(
+                imageVector = YomiIcons.Streak,
+                contentDescription = null,
+                tint = YomiTheme.accents.warning
+            )
             Spacer(Modifier.width(YomiTheme.spacing.medium))
             Text(
                 text = if (state.streak > 0) {
@@ -532,7 +557,12 @@ private fun GoalStrip(state: TodayUiState) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = YomiTheme.spacing.tiny),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(card.goal.emoji)
+                Icon(
+                    imageVector = YomiIcons.Goals,
+                    contentDescription = null,
+                    tint = Color(card.goal.colorArgb.toInt()),
+                    modifier = Modifier.size(18.dp)
+                )
                 Spacer(Modifier.width(YomiTheme.spacing.small))
                 Column(Modifier.weight(1f)) {
                     Text(card.goal.title, style = MaterialTheme.typography.bodyMedium)
@@ -566,20 +596,12 @@ private fun GroupHeader(group: TimelineGroup) {
         group.status != null -> Fmt.status(group.status, strings)
         else -> group.title
     }
-    val emoji = when {
-        group.dayPart != null -> Fmt.dayPartEmoji(group.dayPart)
-        else -> group.emoji
-    }
-    if (title.isBlank() && emoji.isBlank()) return
+    if (title.isBlank()) return
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = YomiTheme.spacing.small),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (emoji.isNotBlank()) {
-            Text(emoji, style = MaterialTheme.typography.labelLarge)
-            Spacer(Modifier.width(YomiTheme.spacing.tiny))
-        }
         Text(
             text = title,
             style = MaterialTheme.typography.labelLarge,
@@ -607,13 +629,21 @@ private fun EntryActions(
     if (finalized) return
     val strings = LocalStrings.current
     Row {
-        TextButton(onClick = onOpen) { Text("⋯") }
+        IconButton(onClick = onOpen) {
+            Icon(YomiIcons.More, contentDescription = strings.edit)
+        }
         if (entry.status.isOpen) {
-            TextButton(onClick = onSkip) { Text("–") }
-            TextButton(onClick = onDefer) { Text("»") }
+            IconButton(onClick = onSkip) {
+                Icon(YomiIcons.Remove, contentDescription = strings.skipTask)
+            }
+            IconButton(onClick = onDefer) {
+                Icon(YomiIcons.Forward, contentDescription = strings.deferTask)
+            }
         }
         if (entry.taskId == null) {
-            TextButton(onClick = onDelete) { Text("🗑") }
+            IconButton(onClick = onDelete) {
+                Icon(YomiIcons.Delete, contentDescription = strings.delete)
+            }
         }
     }
 }
@@ -634,7 +664,7 @@ private fun FinishDayRow(
     }
 }
 
-private val MOOD_EMOJI = listOf("😞", "🙁", "😐", "🙂", "😄")
+private const val MOOD_LEVELS = 5
 private const val ENERGY_LEVELS = 5
 private const val MORNING_END = 12
 private const val AFTERNOON_END = 17

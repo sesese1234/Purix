@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import app.yomi.designsystem.i18n.Strings
+import app.yomi.designsystem.icons.YomiIcons
 import kotlinx.datetime.LocalDate
 
 /** The five places you can be in Yomi. */
@@ -20,13 +22,13 @@ enum class TopLevelTab {
         Settings -> strings.navSettings
     }
 
-    val emoji: String
+    val icon: ImageVector
         get() = when (this) {
-            Today -> "🌤️"
-            Planner -> "🗓️"
-            Goals -> "🎯"
-            Insights -> "📈"
-            Settings -> "⚙️"
+            Today -> YomiIcons.Today
+            Planner -> YomiIcons.Planner
+            Goals -> YomiIcons.Goals
+            Insights -> YomiIcons.Insights
+            Settings -> YomiIcons.Settings
         }
 }
 

@@ -86,7 +86,7 @@ data class BonusRules(
     val scoreCeiling: Double = 100.0
 )
 
-/** A named score range, e.g. "S ✨ 95+". Fully user editable. */
+/** A named score range, e.g. "S" from 95 up. Fully user editable. */
 @Serializable
 data class GradeBand(
     val minScore: Double,
@@ -141,7 +141,7 @@ data class ScoringConfig(
     fun gradeFor(score: Double): GradeBand =
         gradeBands.sortedByDescending { it.minScore }.firstOrNull { score >= it.minScore }
             ?: gradeBands.minByOrNull { it.minScore }
-            ?: GradeBand(0.0, "—", "•")
+            ?: GradeBand(0.0, "—", "")
 
     companion object {
         val defaultPriorityMultipliers: Map<Priority, Double> = mapOf(
@@ -152,12 +152,12 @@ data class ScoringConfig(
         )
 
         val defaultGradeBands: List<GradeBand> = listOf(
-            GradeBand(96.0, "S", "🌟"),
-            GradeBand(88.0, "A", "🔥"),
-            GradeBand(78.0, "B", "💪"),
-            GradeBand(66.0, "C", "🙂"),
-            GradeBand(50.0, "D", "😕"),
-            GradeBand(0.0, "E", "🌧️")
+            GradeBand(96.0, "S", ""),
+            GradeBand(88.0, "A", ""),
+            GradeBand(78.0, "B", ""),
+            GradeBand(66.0, "C", ""),
+            GradeBand(50.0, "D", ""),
+            GradeBand(0.0, "E", "")
         )
     }
 }

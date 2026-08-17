@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -111,7 +113,7 @@ fun StatTile(
     value: String,
     label: String,
     modifier: Modifier = Modifier,
-    emoji: String? = null,
+    icon: ImageVector? = null,
     accent: Color = MaterialTheme.colorScheme.primary
 ) {
     Column(
@@ -121,8 +123,13 @@ fun StatTile(
             .padding(vertical = YomiTheme.spacing.medium, horizontal = YomiTheme.spacing.medium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (emoji != null) {
-            Text(emoji, style = MaterialTheme.typography.titleMedium)
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.size(ICON_SMALL)
+            )
             Spacer(Modifier.height(YomiTheme.spacing.hairline))
         }
         Text(
@@ -147,6 +154,7 @@ fun YomiChip(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
     emoji: String? = null,
+    icon: ImageVector? = null,
     accent: Color? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -163,7 +171,17 @@ fun YomiChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(YomiTheme.spacing.tiny)
     ) {
-        if (emoji != null && YomiTheme.appearance.showEmojis) Text(emoji, style = MaterialTheme.typography.labelLarge)
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (selected) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(ICON_CHIP)
+            )
+        }
+        if (!emoji.isNullOrBlank() && YomiTheme.appearance.showEmojis) {
+            Text(emoji, style = MaterialTheme.typography.labelLarge)
+        }
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
@@ -305,7 +323,7 @@ fun ThinProgress(
 /** The friendly "there is nothing here yet" panel. */
 @Composable
 fun EmptyState(
-    emoji: String,
+    icon: ImageVector,
     title: String,
     body: String,
     modifier: Modifier = Modifier,
@@ -318,7 +336,12 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(YomiTheme.spacing.small)
     ) {
-        Text(emoji, style = MaterialTheme.typography.displaySmall)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
+            modifier = Modifier.size(ICON_EMPTY_STATE)
+        )
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -397,5 +420,9 @@ fun PanelSurface(
         Column(Modifier.padding(YomiTheme.spacing.cardPadding), content = content)
     }
 }
+
+private val ICON_SMALL = 20.dp
+private val ICON_CHIP = 16.dp
+private val ICON_EMPTY_STATE = 44.dp
 
 private const val WAVE_CYCLES = 5f

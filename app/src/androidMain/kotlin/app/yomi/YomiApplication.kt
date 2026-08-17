@@ -30,7 +30,7 @@ class YomiApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         AndroidStorage.initialize(this)
-        AndroidNotifications.initialize(this)
+        AndroidNotifications.initialize(this, R.drawable.ic_notification)
 
         val koin = startKoin {
             modules(yomiModules(defaultDataDirectory(), platformFileSystem()))
